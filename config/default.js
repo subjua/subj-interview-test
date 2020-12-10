@@ -8,6 +8,8 @@ module.exports = {
   host: 'localhost',
   crm: {
     host: MOCK_SERVER,
+    fetchConcurrency: 3,
+    waitForRetry: 3000,
   },
   oms: {
     host: MOCK_SERVER,

@@ -4,6 +4,29 @@ const bodyParserMW = require('koa-bodyparser');
 
 const router = require('./lib/routes');
 
+const errorMiddleware = async (ctx, next) => {
+  try {
+    await next()
+  } catch (err) {
+    console.error(err);
+
+    ctx.status = err.status || 500;
+    ctx.set('Content-Type', 'application/json');
+
+    return {
+      success: false,
+      error: err.message,
+      data: null,
+    };
+  } finally {
+    return {
+      success: true,
+      error: null,
+      data: ctx.response.body,
+    }
+  }
+};
+
 const logMiddleware = async (ctx, next) => {
   const start = Date.now();
 
@@ -23,6 +46,7 @@ async function start() {
   app
     .use(logMiddleware)
     .use(bodyParserMW())
+    .use(errorMiddleware)
     .use(router.allowedMethods())
     .use(router.routes())
     .listen(config.get('port'));
